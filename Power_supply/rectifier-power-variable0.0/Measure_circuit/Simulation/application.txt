@@ -1,0 +1,184 @@
+//////LCD initializations/////////////////
+sbit LCD_RS at RC5_bit;
+sbit LCD_EN at RC4_bit;
+sbit LCD_D4 at RC3_bit;
+sbit LCD_D5 at RC2_bit;
+sbit LCD_D6 at RC1_bit;
+sbit LCD_D7 at RC0_bit;
+
+sbit LCD_RS_Direction at TRISC5_bit;
+sbit LCD_EN_Direction at TRISC4_bit;
+sbit LCD_D4_Direction at TRISC3_bit;
+sbit LCD_D5_Direction at TRISC2_bit;
+sbit LCD_D6_Direction at TRISC1_bit;
+sbit LCD_D7_Direction at TRISC0_bit;
+//////LCD initializations/////////////////
+
+/////Global variables////////////////////
+int adc_point;
+
+/////Global variables////////////////////
+
+////hardware REL MACRO///////////////////////////////
+#define LED 4
+#define PWM 5
+#define VOLT 0
+#define AMP 1
+
+#define OK  1
+#define NOK 0
+
+#define PWM_WIDTH							  1023
+#define VOLT_CALCULATED					      3
+#define VOLT_CORRECTION						  0.2
+#define VOLT_MAPPING_FACTOR					 (VOLT_CALCULATED - VOLT_CORRECTION)
+
+#define AMP_CALCULATED					      2
+#define AMP_CORRECTION						  0.6
+#define AMP_MAPPING_FACTOR					 (AMP_CALCULATED - AMP_CORRECTION)
+
+////SOFT REL MACRO///////////////////////////////
+#define ASCII_DOT                             0x2e
+#define ASCII_V                               0x56
+
+#define SET_BIT(number,bit) 				  (number|=(1<<bit))		
+#define CLR_BIT(number,bit) 				  (number&=(~(1<<bit)))
+#define TOG_BIT(number,bit) 				  (number ^ (1<<bit))
+
+
+////MACRO///////////////////////////////
+
+
+/////functions//
+//---------------------------------------------------------------------------------------------------------------------
+/// @brief  indication shows working status
+/// @arg    void:
+/// @return OK:           Succeed
+///        NOK:          Failed
+//---------------------------------------------------------------------------------------------------------------------
+void indication()
+{
+static int count1;
+TOG_BIT(PORTA,LED);
+}
+//---------------------------------------------------------------------------------------------------------------------
+/// @brief  intializations
+/// @arg    void:
+/// @return OK:           Succeed
+///        NOK:          Failed
+//---------------------------------------------------------------------------------------------------------------------
+int prog_init()
+{
+SET_BIT(TRISA,LED);
+SET_BIT(TRISA,PWM);
+
+ANSEL=0b00000011;
+Lcd_Init();
+Lcd_Out(1,1,"hi");                 // Write text in first row
+delay_ms(100);
+return OK;
+}
+//---------------------------------------------------------------------------------------------------------------------
+/// @brief  Display and ADC calculation for voltage and current
+/// @arg    void:
+/// @return OK:           Succeed
+///        NOK:          Failed
+//---------------------------------------------------------------------------------------------------------------------
+int display()
+{
+	int raw_adc;
+	char cal_adc_str[7]=""  ;
+    char dis_adc_str[7]=""  ;
+	
+	raw_adc=ADC_Read(VOLT);       //voltage
+    adc_point=raw_adc;
+    raw_adc=raw_adc * VOLT_MAPPING_FACTOR ;
+    IntToStr(raw_adc,cal_adc_str);
+
+    dis_adc_str[0]=cal_adc_str[2];
+    dis_adc_str[1]=cal_adc_str[3];
+    dis_adc_str[2]=ASCII_DOT;
+    dis_adc_str[3]=cal_adc_str[4];
+    dis_adc_str[4]=cal_adc_str[5];
+    dis_adc_str[5]=ASCII_V;
+
+    Lcd_Out(1,1,dis_adc_str);
+
+    raw_adc=ADC_Read(AMP);      // ampilfied voltage i.e. current
+    raw_adc=raw_adc*AMP_MAPPING_FACTOR;    //1 is the correction factor
+    IntToStr(raw_adc,cal_adc_str);
+	
+	//calib_adc to dis_adc to be done
+    Lcd_Out(2,1,cal_adc_str);
+	return OK;
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+/// @brief  InitTimer0 initalization for timer 100us timer
+/// @arg    void:
+/// @return OK:           Succeed
+///        NOK:          Failed
+//---------------------------------------------------------------------------------------------------------------------
+
+int InitTimer0(){
+  OPTION_REG	 = 0x88;
+  TMR0		 = 156;
+  INTCON	 = 0xA0;
+  return OK;
+}
+//---------------------------------------------------------------------------------------------------------------------
+/// @brief  timer interrrupt ISR
+/// @arg    void:
+/// @return OK:           Succeed
+///        NOK:          Failed
+//---------------------------------------------------------------------------------------------------------------------
+void Interrupt(){           
+	static int 100us_counter =0;
+  if (TMR0IF_bit){
+    TMR0IF_bit	 = 0;
+    TMR0		 = 156;
+    100us_counter=100us_counter+1;		//soft interrupt routine to be implemented
+    
+     if(100us_counter<adc_point)
+    {
+		SET_BIT(PORTA,PWM);
+    }
+    else if((100us_counter>=adc_point) && (100us_counter< PWM_WIDTH))
+    {
+        CLR_BIT(PORTA,PWM);                 
+    }
+    else
+    {
+        100us_counter=0;
+    }
+  }
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+/// @brief  Main task
+/// @arg    void:
+/// @return OK:           Succeed
+///        NOK:          Failed
+//---------------------------------------------------------------------------------------------------------------------
+void main()
+{
+int ret=NOK;
+ret=prog_init();
+    if(ret==OK)
+	{
+	ret=InitTimer0();
+	}
+	else
+	{
+	}
+	
+    while(ret)
+    {
+        ret=display();
+		indication();
+    }
+	else
+	{
+	// program failed
+	}
+}

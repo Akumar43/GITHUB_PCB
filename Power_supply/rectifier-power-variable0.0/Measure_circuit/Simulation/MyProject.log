@@ -1,0 +1,16 @@
+0	1	mikroCPIC1618.exe -MSF -DBG -pP16F676 -DL -O11111114 -fo4 -N"D:\ELECTRONICS\unsorted new stuffs\rectifier-power-variable\Measure_circuit\Simulation\MyProject.mcppi" -SP"C:\Users\Public\Documents\Mikroelektronika\mikroC PRO for PIC\Defs\" -SP"C:\Users\Public\Documents\Mikroelektronika\mikroC PRO for PIC\Uses\P16\" -SP"D:\ELECTRONICS\unsorted new stuffs\rectifier-power-variable\Measure_circuit\Simulation\" "MyProject.c" "__Lib_Math.mcl" "__Lib_MathDouble.mcl" "__Lib_System.mcl" "__Lib_Delays.mcl" "__Lib_CType.mcl" "__Lib_CString.mcl" "__Lib_CStdlib.mcl" "__Lib_CMath.mcl" "__Lib_MemManager.mcl" "__Lib_Conversions.mcl" "__Lib_Sprinti.mcl" "__Lib_Sprintl.mcl" "__Lib_Time.mcl" "__Lib_Trigonometry.mcl" "__Lib_Button.mcl" "__Lib_Manchester.mcl" "__Lib_OneWire.mcl" "__Lib_PS2.mcl" "__Lib_Sound.mcl" "__Lib_SoftI2C.mcl" "__Lib_SoftSPI.mcl" "__Lib_SoftUART.mcl" "__Lib_ADC_A_B.mcl" "__Lib_EEPROM.mcl" "__Lib_LcdConsts.mcl" "__Lib_Lcd.mcl"	 
+hint: 0	1139	Available RAM: 48 [bytes], Available ROM: 1024 [bytes]	 
+diagnostics: 0	122	Compilation Started	MyProject.c
+hint: 24	1163	Variable 'count1' has been declared, but not used	MyProject.c
+warning: 31	1503	Result is not defined in function: 'protection'	MyProject.c
+warning: 41	1503	Result is not defined in function: 'prog_init'	MyProject.c
+hint: 44	1163	Variable 'ind' has been declared, but not used	MyProject.c
+warning: 63	1503	Result is not defined in function: 'display'	MyProject.c
+diagnostics: 110	123	Compiled Successfully	MyProject.c
+diagnostics: 0	127	All files Compiled in 171 ms	 
+hint: 0	1144	Used RAM (bytes): 40 (83%)  Free RAM (bytes): 8 (17%)	Used RAM (bytes): 40 (83%)  Free RAM (bytes): 8 (17%)
+hint: 0	1144	Used ROM (program words): 1001 (98%)  Free ROM (program words): 23 (2%)	Used ROM (program words): 1001 (98%)  Free ROM (program words): 23 (2%)
+diagnostics: 0	125	Project Linked Successfully	MyProject.mcppi
+diagnostics: 0	128	Linked in 109 ms	 
+diagnostics: 0	129	Project 'MyProject.mcppi' completed: 343 ms	 
+diagnostics: 0	103	Finished successfully: 29 Jan 2017, 00:57:54	MyProject.mcppi
